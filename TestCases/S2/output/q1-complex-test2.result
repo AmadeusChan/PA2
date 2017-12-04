@@ -1,13 +1,7 @@
-Exception in thread "main" java.lang.NullPointerException
-	at decaf.typecheck.TypeCheck.visitAssign(TypeCheck.java:444)
-	at decaf.tree.Tree$Assign.accept(Tree.java:885)
-	at decaf.typecheck.TypeCheck.visitBlock(TypeCheck.java:433)
-	at decaf.tree.Tree$Block.accept(Tree.java:520)
-	at decaf.typecheck.TypeCheck.visitMethodDef(TypeCheck.java:416)
-	at decaf.tree.Tree$MethodDef.accept(Tree.java:440)
-	at decaf.typecheck.TypeCheck.visitClassDef(TypeCheck.java:407)
-	at decaf.tree.Tree$ClassDef.accept(Tree.java:405)
-	at decaf.typecheck.TypeCheck.visitTopLevel(TypeCheck.java:424)
-	at decaf.typecheck.TypeCheck.checkType(TypeCheck.java:60)
-	at decaf.Driver.compile(Driver.java:93)
-	at decaf.Driver.main(Driver.java:107)
+*** Error at (12,11): incompatible operands: string + complex
+*** Error at (15,11): incompatible operands: string + complex
+*** Error at (17,12): incompatible operands: int + string
+*** Error at (19,7): incompatible operands: complex = int
+*** Error at (20,7): incompatible operands: complex = int
+*** Error at (21,17): incompatible operands: complex + string
+*** Error at (21,25): incompatible argument 3: int given, complex expected

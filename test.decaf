@@ -6,5 +6,6 @@ class Main {
 		z = #x;
 		x = @z;
 		x = $z;
+		PrintComp(k);
 	}
 }

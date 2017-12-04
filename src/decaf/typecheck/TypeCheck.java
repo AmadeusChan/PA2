@@ -31,6 +31,7 @@ import decaf.error.RefNonStaticError;
 import decaf.error.SubNotIntError;
 import decaf.error.ThisInStaticFuncError;
 import decaf.error.UndeclVarError;
+import decaf.error.BadPrintCompArgError;
 
 import decaf.frontend.Parser;
 
@@ -623,6 +624,35 @@ public class TypeCheck extends Tree.Visitor {
 			typeArray.type = new ArrayType(typeArray.elementType.type);
 		}
 	}
+
+	@Override
+	public void visitPrintComp(Tree.PrintComp printCompStmt) {
+		int i = 0;
+		for (Tree.Expr e: printCompStmt.exprs) {
+			e.accept(this);
+			++ i;
+			if (!e.type.equal(BaseType.ERROR) && !e.type.equal(BaseType.COMPLEX)) {
+				issueError(new BadPrintCompArgError(e.getLocation(), Integer
+						.toString(i), e.type.toString()));
+			}
+		}
+	}
+
+	/*
+	public void visitPrint(Tree.Print printStmt) {
+		int i = 0;
+		for (Tree.Expr e : printStmt.exprs) {
+			e.accept(this);
+			i++;
+			if (!e.type.equal(BaseType.ERROR) && !e.type.equal(BaseType.BOOL)
+					&& !e.type.equal(BaseType.INT)
+					&& !e.type.equal(BaseType.STRING)) {
+				issueError(new BadPrintArgError(e.getLocation(), Integer
+						.toString(i), e.type.toString()));
+			}
+		}
+	}
+	*/
 
 	private void issueError(DecafError error) {
 		Driver.getDriver().issueError(error);

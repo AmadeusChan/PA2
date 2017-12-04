@@ -90,6 +90,9 @@ public final class Driver {
 		}
 		BuildSym.buildSymbol(tree);
 		checkPoint();
+
+		//System.out.println("Hello World!");
+
 		TypeCheck.checkType(tree);
 		checkPoint();
 		if (option.getLevel() == Option.Level.LEVEL1) {

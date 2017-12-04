@@ -31,7 +31,9 @@ import decaf.error.RefNonStaticError;
 import decaf.error.SubNotIntError;
 import decaf.error.ThisInStaticFuncError;
 import decaf.error.UndeclVarError;
+
 import decaf.error.BadPrintCompArgError;
+import decaf.error.BadCaseExprError;
 
 import decaf.frontend.Parser;
 
@@ -636,6 +638,84 @@ public class TypeCheck extends Tree.Visitor {
 						.toString(i), e.type.toString()));
 			}
 		}
+	}
+
+	@Override
+	public void visitCase(Tree.Case caseExpr) {
+		boolean returnError = false;
+		// check if condition is int
+		caseExpr.condition.accept(this);
+		if (!caseExpr.condition.type.equal(BaseType.ERROR) && !caseExpr.condition.type.equal(BaseType.INT)) {
+			issueError(new BadCaseExprError(BadCaseExprError.BadCondition, caseExpr.condition.getLocation(), caseExpr.condition.type.toString(), "int"));
+			returnError = true;
+		}
+		// check if ci is int
+		boolean isAllCiValid = true;
+		for (Tree.Expr ci: caseExpr.caseConstList) {
+			ci.accept(this);
+			if (!ci.type.equal(BaseType.ERROR) && !ci.type.equal(BaseType.INT)) {
+				issueError(new BadCaseExprError(BadCaseExprError.BadCondition, ci.getLocation(), ci.type.toString(), "int"));
+				returnError = true;
+				isAllCiValid = false;
+			} else if (ci.type.equal(BaseType.ERROR)) {
+				isAllCiValid = false;
+			}
+		}
+		// check if ci is unique
+		if (isAllCiValid) {
+			int s = caseExpr.caseConstList.size();
+			for (int i=0; i<s; ++i) {
+				//System.out.println(((Tree.Literal) caseExpr.caseConstList.get(i)).value);
+				for (int j=0; j<i; ++j) {
+					if (((Tree.Literal) caseExpr.caseConstList.get(i)).value.equals(((Tree.Literal) caseExpr.caseConstList.get(j)).value)) {
+						issueError(new BadCaseExprError(BadCaseExprError.CiNotUnique, caseExpr.caseConstList.get(i).getLocation(), "", ""));
+						returnError = true;
+						break;
+					}
+				}
+			}
+		}
+		// check if all ei valid
+		int len = caseExpr.caseExprList.size();
+		boolean isAllEiValid = true;
+		for (int i=0; i<len; ++i) {
+			Tree.Expr e = caseExpr.caseExprList.get(i);
+			e.accept(this);
+			if (e.type.equal(BaseType.ERROR)) {
+				isAllEiValid = false;
+				returnError = true;
+				break;
+			}
+		}
+		caseExpr.defaultExpr.accept(this);
+		if (caseExpr.defaultExpr.type.equal(BaseType.ERROR)) {
+			isAllEiValid = false;
+		}
+		// check if type of ei are consistent
+		boolean isAllEiConsistent = true;
+		if (isAllEiValid) {
+			for (int i=1; i<len; ++i) {
+				Tree.Expr e = caseExpr.caseExprList.get(i);
+				Tree.Expr pe = caseExpr.caseExprList.get(i-1);
+				if (!e.type.equal(pe.type)) {
+					issueError(new BadCaseExprError(BadCaseExprError.EiNotConsistent, caseExpr.locList.get(i), e.type.toString(), pe.type.toString()));
+					returnError = true;
+					isAllEiConsistent = false;
+					break;
+				}
+			}
+			if (isAllEiConsistent) {
+				Tree.Expr e = caseExpr.defaultExpr;
+				Tree.Expr pe = caseExpr.caseExprList.get(len - 1);
+				if (!e.type.equal(pe.type)) {
+					issueError(new BadCaseExprError(BadCaseExprError.EiNotConsistent, caseExpr.defaultLoc, e.type.toString(), pe.type.toString()));
+					returnError = true;
+					isAllEiConsistent = false;
+				}
+			}
+		}
+
+		if (returnError) caseExpr.type = BaseType.ERROR; else caseExpr.type = caseExpr.defaultExpr.type;
 	}
 
 	/*

@@ -1415,13 +1415,18 @@ public abstract class Tree {
 
 	    public Expr condition, defaultExpr;
 	    public List<Expr> caseConstList, caseExprList;
+	    public List<Location> locList;
+	    public Location defaultLoc;
 
-	    public Case(Expr condition, List<Expr> caseConstList, List<Expr> caseExprList, Expr defaultExpr, Location loc) {
+	    public Case(Expr condition, List<Expr> caseConstList, List<Expr> caseExprList, Expr defaultExpr, Location loc, List<Location> locList, Location defaultLoc) {
 		    super(CASEEXPR, loc);
 		    this.condition = condition;
 		    this.caseConstList = caseConstList;
 		    this.caseExprList = caseExprList;
 		    this.defaultExpr = defaultExpr;
+
+		    this.defaultLoc = defaultLoc;
+		    this.locList = locList;
 	    }
 
 	    	@Override

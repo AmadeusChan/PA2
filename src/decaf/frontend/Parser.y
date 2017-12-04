@@ -14,6 +14,7 @@ import decaf.tree.Tree;
 import decaf.tree.Tree.*;
 import decaf.error.*;
 import java.util.*;
+import decaf.Location;
 %}
 
 %Jclass Parser
@@ -280,6 +281,7 @@ Call            :	Receiver IDENTIFIER '(' Actuals ')'
 DefaultExpr	:	DEFAULT ':' Expr ';'
 	    		{
 				$$.expr = $3.expr;
+				$$.defaultLoc = $1.loc;
 			}
 		;
 
@@ -288,12 +290,14 @@ CaseExprList	:	CaseExprList Constant ':' Expr ';'
 	     		{
 				$$.caseConstList.add($2.expr);
 				$$.caseExprList.add($4.expr);
+				$$.locList.add($2.loc);
 			}
 		|	/* empty */
 			{
 				$$ = new SemValue();
 				$$.caseConstList = new ArrayList<Expr>();
 				$$.caseExprList = new ArrayList<Expr>();
+				$$.locList = new ArrayList<Location>();
 			}
 	     	;
 
@@ -312,7 +316,7 @@ Expr            :	DCOPY '(' Expr ')'
 		|	CASE '(' Expr ')' '{' CaseExprList DefaultExpr '}' 
 			{
 				$$.expr = new Tree.Case(
-						$3.expr, $6.caseConstList, $6.caseExprList, $7.expr, $1.loc
+						$3.expr, $6.caseConstList, $6.caseExprList, $7.expr, $1.loc, $6.locList, $7.defaultLoc
 					);
 			}
 		|	LValue

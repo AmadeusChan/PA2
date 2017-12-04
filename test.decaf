@@ -1,11 +1,14 @@
 class Main {
 	static void main() {
 		complex z;
-		z = 1 + 3j + -1;
+		int k;
+		Print(k);
 		int x;
-		z = #x;
-		x = @z;
-		x = $z;
-		PrintComp(k);
+		x = case(x) {
+			1: 2;
+			3: 3;
+			3: "hello world";
+			default: 0;
+		};
 	}
 }

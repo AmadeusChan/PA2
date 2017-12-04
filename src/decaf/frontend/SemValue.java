@@ -63,6 +63,8 @@ public class SemValue {
 	 * case statement list
 	 */
 	public List<Expr> caseConstList, caseExprList;
+	public List<Location> locList;
+	public Location defaultLoc;
 
 	public Expr caseConst, caseExpr;
 

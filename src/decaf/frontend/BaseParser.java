@@ -4,6 +4,7 @@ import decaf.Driver;
 import decaf.tree.Tree;
 import decaf.error.DecafError;
 import decaf.error.MsgError;
+import decaf.Location;
 
 public abstract class BaseParser {
 	private Lexer lexer;

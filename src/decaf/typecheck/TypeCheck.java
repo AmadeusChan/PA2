@@ -542,6 +542,9 @@ public class TypeCheck extends Tree.Visitor {
 		case Tree.BOOL:
 			type.type = BaseType.BOOL;
 			break;
+		case Tree.COMPLEX:
+			type.type = BaseType.COMPLEX;
+			break;
 		default:
 			type.type = BaseType.STRING;
 		}

@@ -1,8 +1,6 @@
 class Main {
 	static void main() {
+		complex z;
 		int x;
-		int y;
-		int z;
-		z = x + y;
 	}
 }

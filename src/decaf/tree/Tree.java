@@ -17,6 +17,7 @@ import decaf.utils.IndentPrintWriter;
 import decaf.utils.MiscUtils;
 
 
+
 /**
  * Root class for abstract syntax tree nodes. It provides
  *  definitions for specific tree nodes as subclasses nested inside
@@ -1461,6 +1462,7 @@ public abstract class Tree {
     }
 
     public static class SuperExpr extends Expr {
+	public Class parent;
  
      	public SuperExpr(Location loc) {
      		super(SUPEREXPR, loc);

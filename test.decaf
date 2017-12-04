@@ -1,14 +1,27 @@
 class Main {
 	static void main() {
-		complex z;
-		int k;
-		Print(k);
-		int x;
-		x = case(x) {
-			1: 2;
-			3: 3;
-			3: "hello world";
-			default: 0;
-		};
+	}
+}
+
+class Creature {
+	int run() {
+	}
+	void no() {
+	}
+}
+
+class Animal extends Creature {
+	int x;
+	void go() {
+	}
+}
+
+class Cat extends Animal {
+	void hello() {
+		super.go();
+		super.no();
+		int y;
+		y = super.x;
+		super.run();
 	}
 }

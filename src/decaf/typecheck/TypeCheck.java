@@ -34,6 +34,7 @@ import decaf.error.UndeclVarError;
 
 import decaf.error.BadPrintCompArgError;
 import decaf.error.BadCaseExprError;
+import decaf.error.SuperError;
 
 import decaf.frontend.Parser;
 
@@ -191,6 +192,12 @@ public class TypeCheck extends Tree.Visitor {
 		Type receiverType = callExpr.receiver == null ? ((ClassScope) table
 				.lookForScope(Scope.Kind.CLASS)).getOwner().getType()
 				: callExpr.receiver.type;
+		if (callExpr.receiver instanceof Tree.SuperExpr) {
+			Class parent = ((Tree.SuperExpr) callExpr.receiver).parent;
+			receiverType = parent.getType();
+		} 
+
+
 		if (f == null) {
 			issueError(new FieldNotFoundError(callExpr.getLocation(),
 					callExpr.method, receiverType.toString()));
@@ -286,9 +293,21 @@ public class TypeCheck extends Tree.Visitor {
 			return;
 		}
 
-		ClassScope cs = ((ClassType) callExpr.receiver.type)
-				.getClassScope();
-		checkCallExpr(callExpr, cs.lookupVisible(callExpr.method));
+		if (callExpr.receiver instanceof Tree.SuperExpr) {
+			Class parent = ((Tree.SuperExpr) callExpr.receiver).parent;
+			if (parent == null) {
+				issueError(new SuperError(callExpr.getLocation(), SuperError.NO_PARENT_CLASS, "", callExpr.receiver.type.toString()));
+				callExpr.type = BaseType.ERROR;
+				return ;
+			}
+			ClassScope cs = ((ClassType) parent.getType())
+					.getClassScope();
+			checkCallExpr(callExpr, cs.lookupVisible(callExpr.method));
+		} else {
+			ClassScope cs = ((ClassType) callExpr.receiver.type)
+					.getClassScope();
+			checkCallExpr(callExpr, cs.lookupVisible(callExpr.method));
+		}
 	}
 
 	@Override
@@ -416,35 +435,41 @@ public class TypeCheck extends Tree.Visitor {
 		} else {
 			ident.owner.usedForRef = true;
 			ident.owner.accept(this);
+
 			if (!ident.owner.type.equal(BaseType.ERROR)) {
-				if (ident.owner.isClass || !ident.owner.type.isClassType()) {
-					issueError(new NotClassFieldError(ident.getLocation(),
-							ident.name, ident.owner.type.toString()));
+				if ((ident.owner instanceof Tree.SuperExpr)) {
+					issueError(new SuperError(ident.getLocation(), SuperError.ACCESS_VAR_MEM, "", ""));
 					ident.type = BaseType.ERROR;
 				} else {
-					ClassScope cs = ((ClassType) ident.owner.type)
-							.getClassScope();
-					Symbol v = cs.lookupVisible(ident.name);
-					if (v == null) {
-						issueError(new FieldNotFoundError(ident.getLocation(),
+					if (ident.owner.isClass || !ident.owner.type.isClassType()) {
+						issueError(new NotClassFieldError(ident.getLocation(),
 								ident.name, ident.owner.type.toString()));
 						ident.type = BaseType.ERROR;
-					} else if (v.isVariable()) {
-						ClassType thisType = ((ClassScope) table
-								.lookForScope(Scope.Kind.CLASS)).getOwner()
-								.getType();
-						ident.type = v.getType();
-						if (!thisType.compatible(ident.owner.type)) {
-							issueError(new FieldNotAccessError(ident
-									.getLocation(), ident.name,
-									ident.owner.type.toString()));
-						} else {
-							ident.symbol = (Variable) v;
-							ident.lvKind = Tree.LValue.Kind.MEMBER_VAR;
-						}
 					} else {
-						ident.type = v.getType();
+						ClassScope cs = ((ClassType) ident.owner.type)
+								.getClassScope();
+						Symbol v = cs.lookupVisible(ident.name);
+						if (v == null) {
+							issueError(new FieldNotFoundError(ident.getLocation(),
+									ident.name, ident.owner.type.toString()));
+							ident.type = BaseType.ERROR;
+						} else if (v.isVariable()) {
+							ClassType thisType = ((ClassScope) table
+									.lookForScope(Scope.Kind.CLASS)).getOwner()
+									.getType();
+							ident.type = v.getType();
+							if (!thisType.compatible(ident.owner.type)) {
+								issueError(new FieldNotAccessError(ident
+										.getLocation(), ident.name,
+										ident.owner.type.toString()));
+							} else {
+									ident.symbol = (Variable) v;
+									ident.lvKind = Tree.LValue.Kind.MEMBER_VAR;
+							}
+						} else {
+							ident.type = v.getType();
 					}
+				}
 				}
 			} else {
 				ident.type = BaseType.ERROR;
@@ -733,6 +758,32 @@ public class TypeCheck extends Tree.Visitor {
 		}
 	}
 	*/
+
+
+	/*
+	@Override
+	public void visitThisExpr(Tree.ThisExpr thisExpr) {
+		if (currentFunction.isStatik()) {
+			issueError(new ThisInStaticFuncError(thisExpr.getLocation()));
+			thisExpr.type = BaseType.ERROR;
+		} else {
+			thisExpr.type = ((ClassScope) table.lookForScope(Scope.Kind.CLASS))
+					.getOwner().getType();
+		}
+	}
+	*/
+
+	@Override
+	public void visitSuperExpr(Tree.SuperExpr expr) {
+		if (currentFunction.isStatik()) {
+			issueError(new SuperError(expr.getLocation(), SuperError.USED_IN_STATIC_FUN, "", ""));
+			expr.type = BaseType.ERROR;
+		} else {
+			Class currentClass = ((ClassScope) table.lookForScope(Scope.Kind.CLASS)).getOwner();
+			expr.parent = currentClass.getParent();
+			expr.type = currentClass.getType();
+		}
+	}
 
 	private void issueError(DecafError error) {
 		Driver.getDriver().issueError(error);

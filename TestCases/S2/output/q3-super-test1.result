@@ -1,15 +1,30 @@
-Exception in thread "main" java.lang.NullPointerException
-	at decaf.typecheck.TypeCheck.visitCallExpr(TypeCheck.java:210)
-	at decaf.tree.Tree$CallExpr.accept(Tree.java:1039)
-	at decaf.typecheck.TypeCheck.visitAssign(TypeCheck.java:441)
-	at decaf.tree.Tree$Assign.accept(Tree.java:885)
-	at decaf.typecheck.TypeCheck.visitBlock(TypeCheck.java:433)
-	at decaf.tree.Tree$Block.accept(Tree.java:520)
-	at decaf.typecheck.TypeCheck.visitMethodDef(TypeCheck.java:416)
-	at decaf.tree.Tree$MethodDef.accept(Tree.java:440)
-	at decaf.typecheck.TypeCheck.visitClassDef(TypeCheck.java:407)
-	at decaf.tree.Tree$ClassDef.accept(Tree.java:405)
-	at decaf.typecheck.TypeCheck.visitTopLevel(TypeCheck.java:424)
-	at decaf.typecheck.TypeCheck.checkType(TypeCheck.java:60)
-	at decaf.Driver.compile(Driver.java:93)
-	at decaf.Driver.main(Driver.java:107)
+GLOBAL SCOPE:
+    (1,1) -> class people
+    (10,1) -> class student : people
+    (25,1) -> class Main
+    CLASS SCOPE OF 'people':
+        (2,6) -> variable age : int
+        (3,9) -> variable name : string
+        (5,6) -> function getage : class : people->int
+        FORMAL SCOPE OF 'getage':
+            (5,6) -> variable @this : class : people
+            LOCAL SCOPE:
+    CLASS SCOPE OF 'student':
+        (11,6) -> variable stuid : int
+        (13,6) -> function BeMan : class : student->int->string->int
+        (20,6) -> function getid : class : student->int
+        FORMAL SCOPE OF 'BeMan':
+            (13,6) -> variable @this : class : student
+            (13,16) -> variable @age : int
+            (13,28) -> variable @name : string
+            LOCAL SCOPE:
+                (14,7) -> variable a : int
+                (15,7) -> variable b : int
+        FORMAL SCOPE OF 'getid':
+            (20,6) -> variable @this : class : student
+            LOCAL SCOPE:
+    CLASS SCOPE OF 'Main':
+        (26,17) -> static function main : void
+        FORMAL SCOPE OF 'main':
+            LOCAL SCOPE:
+                (27,18) -> variable ab : class : student

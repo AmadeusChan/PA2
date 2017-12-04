@@ -1,15 +1,8 @@
-Exception in thread "main" java.lang.NullPointerException
-	at decaf.typecheck.TypeCheck.visitIdent(TypeCheck.java:367)
-	at decaf.tree.Tree$Ident.accept(Tree.java:1217)
-	at decaf.typecheck.TypeCheck.visitAssign(TypeCheck.java:441)
-	at decaf.tree.Tree$Assign.accept(Tree.java:885)
-	at decaf.typecheck.TypeCheck.visitBlock(TypeCheck.java:433)
-	at decaf.tree.Tree$Block.accept(Tree.java:520)
-	at decaf.typecheck.TypeCheck.visitMethodDef(TypeCheck.java:416)
-	at decaf.tree.Tree$MethodDef.accept(Tree.java:440)
-	at decaf.typecheck.TypeCheck.visitClassDef(TypeCheck.java:407)
-	at decaf.tree.Tree$ClassDef.accept(Tree.java:405)
-	at decaf.typecheck.TypeCheck.visitTopLevel(TypeCheck.java:424)
-	at decaf.typecheck.TypeCheck.checkType(TypeCheck.java:60)
-	at decaf.Driver.compile(Driver.java:93)
-	at decaf.Driver.main(Driver.java:107)
+*** Error at (7,7): can not use super in static function
+*** Error at (12,13): super.member_var is not supported
+*** Error at (17,13): no parent class exist for class : people
+*** Error at (32,5): incompatible operands: int = class : student
+*** Error at (33,13): super.member_var is not supported
+*** Error at (34,13): field 'getid' not found in 'class : people'
+*** Error at (35,13): super.member_var is not supported
+*** Error at (36,13): 'age' is not a method in class 'class : people'

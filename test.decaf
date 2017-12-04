@@ -17,11 +17,6 @@ class Animal extends Creature {
 
 class Cat extends Animal {
 	void hello() {
-		class Animal x;
-		class Animal y;
-		x = dcopy(y);
-		x = scopy(y);
-		class Creature k;
-		k = dcopy(x);
+		do true : Print(1); ||| false: int x; od;
 	}
 }

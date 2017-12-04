@@ -814,6 +814,32 @@ public class TypeCheck extends Tree.Visitor {
 		}
 	}
 
+	/*
+	public void visitWhileLoop(Tree.WhileLoop whileLoop) {
+		checkTestExpr(whileLoop.condition);
+		breaks.add(whileLoop);
+		if (whileLoop.loopBody != null) {
+			whileLoop.loopBody.accept(this);
+		}
+		breaks.pop();
+	}
+	*/
+
+	public void visitDoOdLoop(Tree.DoOdLoop loop) {
+		int len = loop.exprList.size();
+		breaks.add(loop);
+		for (int i=0; i<len; ++i) {
+			Tree.Expr cond = loop.exprList.get(i);
+			Tree stmt = loop.stmtList.get(i);
+			cond.accept(this);
+			if (!cond.type.equal(BaseType.BOOL) && !cond.type.equal(BaseType.ERROR)) {
+				issueError(new BadDoConditionError(cond.getLocation(), cond.type.toString()));
+			}
+			stmt.accept(this);
+		}
+		breaks.pop();
+	}
+
 	private void issueError(DecafError error) {
 		Driver.getDriver().issueError(error);
 	}

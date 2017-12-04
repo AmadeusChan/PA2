@@ -245,6 +245,13 @@ public class BuildSym extends Tree.Visitor {
 		}
 	}
 
+	@Override 
+	public void visitDoOdLoop(Tree.DoOdLoop loop) {
+		for (Tree stmt: loop.stmtList) {
+			stmt.accept(this);
+		}
+	}
+
 	private int calcOrder(Class c) {
 		if (c == null) {
 			return -1;

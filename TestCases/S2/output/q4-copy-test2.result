@@ -1,13 +1,6 @@
-Exception in thread "main" java.lang.NullPointerException
-	at decaf.typecheck.TypeCheck.visitAssign(TypeCheck.java:444)
-	at decaf.tree.Tree$Assign.accept(Tree.java:885)
-	at decaf.typecheck.TypeCheck.visitBlock(TypeCheck.java:433)
-	at decaf.tree.Tree$Block.accept(Tree.java:520)
-	at decaf.typecheck.TypeCheck.visitMethodDef(TypeCheck.java:416)
-	at decaf.tree.Tree$MethodDef.accept(Tree.java:440)
-	at decaf.typecheck.TypeCheck.visitClassDef(TypeCheck.java:407)
-	at decaf.tree.Tree$ClassDef.accept(Tree.java:405)
-	at decaf.typecheck.TypeCheck.visitTopLevel(TypeCheck.java:424)
-	at decaf.typecheck.TypeCheck.checkType(TypeCheck.java:60)
-	at decaf.Driver.compile(Driver.java:93)
-	at decaf.Driver.main(Driver.java:107)
+*** Error at (12,8): expected class type for copy expr but int given
+*** Error at (13,6): For copy expr, the source class : student and the destination class : people are not same
+*** Error at (14,6): For copy expr, the source class : people and the destination class : student are not same
+*** Error at (15,6): For copy expr, the source class : animal and the destination class : people are not same
+*** Error at (16,6): For copy expr, the source class : animal and the destination int are not same
+*** Error at (36,5): For copy expr, the source class : student and the destination class : people are not same

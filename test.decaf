@@ -4,8 +4,7 @@ class Main {
 }
 
 class Creature {
-	int run() {
-	}
+	int run;
 	void no() {
 	}
 }
@@ -18,10 +17,11 @@ class Animal extends Creature {
 
 class Cat extends Animal {
 	void hello() {
-		super.go();
-		super.no();
-		int y;
-		y = super.x;
-		super.run();
+		class Animal x;
+		class Animal y;
+		x = dcopy(y);
+		x = scopy(y);
+		class Creature k;
+		k = dcopy(x);
 	}
 }

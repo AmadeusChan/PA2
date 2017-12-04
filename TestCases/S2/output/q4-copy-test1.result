@@ -1,18 +1,43 @@
-Exception in thread "main" java.lang.NullPointerException
-	at decaf.typecheck.TypeCheck.visitCallExpr(TypeCheck.java:210)
-	at decaf.tree.Tree$CallExpr.accept(Tree.java:1039)
-	at decaf.typecheck.TypeCheck.checkBinaryOp(TypeCheck.java:581)
-	at decaf.typecheck.TypeCheck.visitBinary(TypeCheck.java:65)
-	at decaf.tree.Tree$Binary.accept(Tree.java:968)
-	at decaf.typecheck.TypeCheck.visitAssign(TypeCheck.java:441)
-	at decaf.tree.Tree$Assign.accept(Tree.java:885)
-	at decaf.typecheck.TypeCheck.visitBlock(TypeCheck.java:433)
-	at decaf.tree.Tree$Block.accept(Tree.java:520)
-	at decaf.typecheck.TypeCheck.visitMethodDef(TypeCheck.java:416)
-	at decaf.tree.Tree$MethodDef.accept(Tree.java:440)
-	at decaf.typecheck.TypeCheck.visitClassDef(TypeCheck.java:407)
-	at decaf.tree.Tree$ClassDef.accept(Tree.java:405)
-	at decaf.typecheck.TypeCheck.visitTopLevel(TypeCheck.java:424)
-	at decaf.typecheck.TypeCheck.checkType(TypeCheck.java:60)
-	at decaf.Driver.compile(Driver.java:93)
-	at decaf.Driver.main(Driver.java:107)
+GLOBAL SCOPE:
+    (1,1) -> class Main
+    (18,1) -> class people
+    (27,1) -> class student : people
+    (42,1) -> class animal
+    CLASS SCOPE OF 'Main':
+        (2,17) -> static function main : void
+        FORMAL SCOPE OF 'main':
+            LOCAL SCOPE:
+                (3,8) -> variable i : int
+                (4,17) -> variable a : class : people
+                (5,17) -> variable b : class : people
+                (6,17) -> variable c : class : people
+                (7,18) -> variable d : class : student
+                (8,17) -> variable x : class : animal
+    CLASS SCOPE OF 'people':
+        (19,6) -> variable age : int
+        (20,9) -> variable name : string
+        (22,6) -> function getage : class : people->int
+        FORMAL SCOPE OF 'getage':
+            (22,6) -> variable @this : class : people
+            LOCAL SCOPE:
+    CLASS SCOPE OF 'student':
+        (28,6) -> variable stuid : int
+        (30,6) -> function BeMan : class : student->int->string->int
+        (37,6) -> function getid : class : student->int
+        FORMAL SCOPE OF 'BeMan':
+            (30,6) -> variable @this : class : student
+            (30,16) -> variable @age : int
+            (30,28) -> variable @name : string
+            LOCAL SCOPE:
+                (31,7) -> variable a : int
+                (32,7) -> variable b : int
+        FORMAL SCOPE OF 'getid':
+            (37,6) -> variable @this : class : student
+            LOCAL SCOPE:
+    CLASS SCOPE OF 'animal':
+        (43,6) -> variable age : int
+        (44,9) -> variable type : string
+        (46,9) -> function gettype : class : animal->string
+        FORMAL SCOPE OF 'gettype':
+            (46,9) -> variable @this : class : animal
+            LOCAL SCOPE:

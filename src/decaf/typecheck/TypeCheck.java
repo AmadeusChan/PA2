@@ -35,6 +35,7 @@ import decaf.error.UndeclVarError;
 import decaf.error.BadPrintCompArgError;
 import decaf.error.BadCaseExprError;
 import decaf.error.SuperError;
+import decaf.error.*;
 
 import decaf.frontend.Parser;
 
@@ -516,6 +517,12 @@ public class TypeCheck extends Tree.Visitor {
 	public void visitAssign(Tree.Assign assign) {
 		assign.left.accept(this);
 		assign.expr.accept(this);
+		if (!assign.left.type.equal(BaseType.ERROR) && !assign.expr.type.equal(BaseType.ERROR) && ((assign.expr instanceof Tree.DCopyExpr) || (assign.expr instanceof Tree.SCopyExpr))) {
+			if (!assign.left.type.equal(assign.expr.type)) {
+				issueError(new CopyError(assign.getLocation(), CopyError.DESTINATION_NOT_CONSISTENT, "", assign.expr.type.toString(), assign.left.type.toString()));
+				return ;
+			}
+		}
 		if (!assign.left.type.equal(BaseType.ERROR)
 				&& (assign.left.type.isFuncType() || !assign.expr.type
 						.compatible(assign.left.type))) {
@@ -782,6 +789,28 @@ public class TypeCheck extends Tree.Visitor {
 			Class currentClass = ((ClassScope) table.lookForScope(Scope.Kind.CLASS)).getOwner();
 			expr.parent = currentClass.getParent();
 			expr.type = currentClass.getType();
+		}
+	}
+
+	@Override 
+	public void visitDCopyExpr(Tree.DCopyExpr expr) {
+		expr.expr.accept(this);
+		if (expr.expr.type.isClassType()) {
+			expr.type = expr.expr.type;
+		} else {
+			issueError(new CopyError(expr.getLocation(), CopyError.NOT_CLASS, expr.expr.type.toString(), " ", " "));
+			expr.type = BaseType.ERROR;
+		}
+	}
+
+	@Override 
+	public void visitSCopyExpr(Tree.SCopyExpr expr) {
+		expr.expr.accept(this);
+		if (expr.expr.type.isClassType()) {
+			expr.type = expr.expr.type;
+		} else {
+			issueError(new CopyError(expr.getLocation(), CopyError.NOT_CLASS, expr.expr.type.toString(), " ", " "));
+			expr.type = BaseType.ERROR;
 		}
 	}
 

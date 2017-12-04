@@ -24,15 +24,19 @@ import java.util.*;
 %Jnodebug
 %Jnoconstruct
 
-%token VOID   BOOL  INT   STRING  CLASS 
-%token NULL   EXTENDS     THIS     WHILE   FOR   
+%token VOID   BOOL  INT   STRING  COMPLEX CLASS 
+%token NULL   EXTENDS     THIS SUPER     WHILE   FOR   
 %token IF     ELSE        RETURN   BREAK   NEW
-%token PRINT  READ_INTEGER         READ_LINE
+%token CASE DEFAULT
+%token PRINT  READ_INTEGER         READ_LINE PRINTCOMP
 %token LITERAL
 %token IDENTIFIER	  AND    OR    STATIC  INSTANCEOF
 %token LESS_EQUAL   GREATER_EQUAL  EQUAL   NOT_EQUAL
+%token DCOPY SCOPY
+%token DO OD DOSEPERATOR
 %token '+'  '-'  '*'  '/'  '%'  '='  '>'  '<'  '.'
 %token ','  ';'  '!'  '('  ')'  '['  ']'  '{'  '}'
+%token '@'  '$' '#'
 
 %left OR
 %left AND 
@@ -44,6 +48,7 @@ import java.util.*;
 %nonassoc '[' '.' 
 %nonassoc ')' EMPTY
 %nonassoc ELSE
+%right '@' '$' '#'
 
 %start Program
 
@@ -90,6 +95,10 @@ Type            :	INT
                 	{
                 		$$.type = new Tree.TypeIdent(Tree.STRING, $1.loc);
                 	}
+		|	COMPLEX
+			{
+				$$.type = new Tree.TypeIdent(Tree.COMPLEX, $1.loc);
+			}
                 |	CLASS IDENTIFIER
                 	{
                 		$$.type = new Tree.TypeClass($2.ident, $1.loc);
@@ -195,7 +204,35 @@ Stmt		    :	VariableDef
                 |	PrintStmt ';'
                 |	BreakStmt ';'
                 |	StmtBlock
+		| 	PrintCompStmt ';'
+		|	DoStmt ';'
                 ;
+
+DoStmt		:	DO DoBranchList DoSubStmt OD
+			{
+				$$.stmt = new Tree.DoOdLoop($2.doExprList, $2.doStmtList, $3.doExpr, $3.doStmt, $1.loc);
+			}
+		;
+
+DoBranchList	:	DoBranchList DoSubStmt DOSEPERATOR 
+	     		{
+				$$.doExprList.add($2.doExpr);
+				$$.doStmtList.add($2.doStmt);
+			}
+	     	|	/* empty */
+			{
+				$$ = new SemValue();
+				$$.doExprList = new ArrayList<Expr>();
+				$$.doStmtList = new ArrayList<Tree>();
+			}
+		;
+
+DoSubStmt	:	Expr ':' Stmt
+	  		{
+				$$.doExpr = $1.expr;
+				$$.doStmt = $3.stmt;
+			}
+		;
 
 SimpleStmt      :	LValue '=' Expr
 					{
@@ -240,7 +277,45 @@ Call            :	Receiver IDENTIFIER '(' Actuals ')'
 					}
                 ;
 
-Expr            :	LValue
+DefaultExpr	:	DEFAULT ':' Expr ';'
+	    		{
+				$$.expr = $3.expr;
+			}
+		;
+
+
+CaseExprList	:	CaseExprList Constant ':' Expr ';'
+	     		{
+				$$.caseConstList.add($2.expr);
+				$$.caseExprList.add($4.expr);
+			}
+		|	/* empty */
+			{
+				$$ = new SemValue();
+				$$.caseConstList = new ArrayList<Expr>();
+				$$.caseExprList = new ArrayList<Expr>();
+			}
+	     	;
+
+Expr            :	DCOPY '(' Expr ')'
+			{
+				$$.expr = new Tree.DCopyExpr($3.expr, $1.loc);
+			}
+		|	SCOPY '(' Expr ')'
+			{
+				$$.expr = new Tree.SCopyExpr($3.expr, $1.loc);
+			}
+		|	SUPER 
+			{
+                		$$.expr = new Tree.SuperExpr($1.loc);
+			}
+		|	CASE '(' Expr ')' '{' CaseExprList DefaultExpr '}' 
+			{
+				$$.expr = new Tree.Case(
+						$3.expr, $6.caseConstList, $6.caseExprList, $7.expr, $1.loc
+					);
+			}
+		|	LValue
 					{
 						$$.expr = $1.lvalue;
 					}
@@ -309,6 +384,18 @@ Expr            :	LValue
                 |	'!' Expr
                 	{
                 		$$.expr = new Tree.Unary(Tree.NOT, $2.expr, $1.loc);
+                	}
+                |	'@' Expr
+                	{
+                		$$.expr = new Tree.Unary(Tree.GETCOMPRE, $2.expr, $1.loc);
+                	}
+                |	'$' Expr
+                	{
+                		$$.expr = new Tree.Unary(Tree.GETCOMPIM, $2.expr, $1.loc);
+                	}
+                |	'#' Expr
+                	{
+                		$$.expr = new Tree.Unary(Tree.INT2COMP, $2.expr, $1.loc);
                 	}
                 |	READ_INTEGER '(' ')'
                 	{
@@ -418,6 +505,12 @@ PrintStmt       :	PRINT '(' ExprList ')'
 						$$.stmt = new Print($3.elist, $1.loc);
 					}
                 ;
+
+PrintCompStmt	:	PRINTCOMP '(' ExprList ')'
+	      		{
+				$$.stmt = new PrintComp($3.elist, $1.loc);
+			}
+		;
 
 %%
     

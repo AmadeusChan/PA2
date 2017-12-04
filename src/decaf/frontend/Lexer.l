@@ -37,7 +37,7 @@ HEX_INTEGER			= (0[Xx]{HEX_DIGIT}+)
 DEC_INTEGER			= ({DIGIT}+)
 INTEGER				= ({HEX_INTEGER}|{DEC_INTEGER})
 IDENTIFIER			= ([A-Za-z][_0-9A-Za-z]*)
-SIMPLE_OPERATOR		= ("+"|"-"|"*"|"/"|"%"|"="|"<"|">"|"."|","|";"|"!"|"("|")"|"["|"]"|"{"|"}")
+SIMPLE_OPERATOR		= ("+"|"-"|"*"|"/"|"%"|"="|"<"|">"|"."|","|";"|"!"|"("|")"|"["|"]"|"{"|"}"|"@"|"$"|"#"|":")
 S_COMMENT			= ("//"[^\r\n]*{NEWLINE})
 WHITESPACE			= ([ \t]+)
 
@@ -73,6 +73,25 @@ WHITESPACE			= ([ \t]+)
 "static"			{ return keyword(Parser.STATIC);		}
 "instanceof"		{ return keyword(Parser.INSTANCEOF);	}
 
+	// for complex
+"complex"			{ return keyword(Parser.COMPLEX); }
+"PrintComp"			{ return keyword(Parser.PRINTCOMP); }
+	
+	// for case statements
+"case"				{ return keyword(Parser.CASE); }
+"default"			{ return keyword(Parser.DEFAULT); }
+	
+	// for super keyword
+"super"				{ return keyword(Parser.SUPER); }
+	
+	// keywords for copy
+"dcopy"				{ return keyword(Parser.DCOPY); }
+"scopy"				{ return keyword(Parser.SCOPY); } 
+	
+	// keywords for do-od statement
+"do"				{ return keyword(Parser.DO); }
+"od"				{ return keyword(Parser.OD); }
+
 	// 识别操作符的规则
 "<="				{ return operator(Parser.LESS_EQUAL);	}
 ">="				{ return operator(Parser.GREATER_EQUAL);}
@@ -80,11 +99,13 @@ WHITESPACE			= ([ \t]+)
 "!="				{ return operator(Parser.NOT_EQUAL);	}
 "&&"				{ return operator(Parser.AND);			}
 "||"				{ return operator(Parser.OR);			}
+"|||"				{ return operator(Parser.DOSEPERATOR); }
 {SIMPLE_OPERATOR}	{ return operator((int)yycharat(0));	}
 
 	// 识别常数的规则
 "true"				{ return boolConst(true);										}
 "false"				{ return boolConst(false);										}
+{INTEGER}j			{ return imgConst(yytext()); }
 {INTEGER}			{ return intConst(yytext());			}
 <YYINITIAL>\"		{ sloc = getLocation();		  
 					  yybegin(S);

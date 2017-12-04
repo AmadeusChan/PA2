@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 def read_txt_file(filename):
-    with open(filename,'a+') as f:
+    with open(filename,'r') as f:
         txt = f.read().strip()
     # Python should be able to do it automatically, but just in case...
     txt = txt.replace('\r','')

@@ -11,6 +11,7 @@ import decaf.tree.Tree.LValue;
 import decaf.tree.Tree.TopLevel;
 import decaf.tree.Tree.VarDef;
 import decaf.tree.Tree.TypeLiteral;
+import decaf.tree.Tree.*;
 import decaf.utils.MiscUtils;
 
 public class SemValue {
@@ -57,6 +58,21 @@ public class SemValue {
 	public Expr expr;
 
 	public LValue lvalue;
+
+	/**
+	 * case statement list
+	 */
+	public List<Expr> caseConstList, caseExprList;
+
+	public Expr caseConst, caseExpr;
+
+	/**
+	 * do-od statement list
+	 */
+	public List<Expr> doExprList;
+	public List<Tree> doStmtList;
+	public Expr doExpr;
+	public Tree doStmt;
 
 	/**
 	 * 创建一个关键字的语义值
@@ -182,6 +198,33 @@ public class SemValue {
 		case Parser.STATIC:
 			msg = "keyword : static";
 			break;
+		case Parser.COMPLEX:
+			msg = "keyword : complex";
+			break;
+		case Parser.PRINTCOMP:
+			msg = "keyword : PrintComp";
+			break;
+		case Parser.CASE:
+			msg = "keyword : case";
+			break;
+		case Parser.DEFAULT:
+			msg = "keyword : default";
+			break;
+		case Parser.SUPER:
+			msg = "keyword : super";
+			break;
+		case Parser.DCOPY:
+			msg = "keyword : dcopy";
+			break;
+		case Parser.SCOPY:
+			msg = "keyword : scopy";
+			break;
+		case Parser.DO:
+			msg = "keyword : do";
+			break;
+		case Parser.OD:
+			msg = "keyword : od";
+			break;
 
 		// 常量
 		case Parser.LITERAL:
@@ -218,6 +261,9 @@ public class SemValue {
 			break;
 		case Parser.OR:
 			msg = "operator : ||";
+			break;
+		case Parser.DOSEPERATOR:
+			msg = "operator : |||";
 			break;
 		default:
 			msg = "operator : " + (char) code;

@@ -60,6 +60,18 @@ public abstract class BaseLexer {
 		return Parser.LITERAL;
 	}
 
+	protected int imgConst(String ival) {
+		String temp = ival.substring(0, ival.length() - 1);
+		try {
+			setSemantic(getLocation(), SemValue.createLiteral(
+					Tree.COMPIMG, Integer.decode(temp)));
+		} catch (NumberFormatException e) {
+			Driver.getDriver().issueError(
+					new IntTooLargeError(getLocation(), temp));
+		}
+		return Parser.LITERAL;
+	}
+
 	protected int identifier(String name) {
 		setSemantic(getLocation(), SemValue.createIdentifier(name));
 		return Parser.IDENTIFIER;

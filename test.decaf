@@ -1,6 +1,10 @@
 class Main {
 	static void main() {
 		complex z;
+		z = 1 + 3j + -1;
 		int x;
+		z = #x;
+		x = @z;
+		x = $z;
 	}
 }

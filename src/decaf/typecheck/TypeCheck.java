@@ -31,16 +31,20 @@ import decaf.error.RefNonStaticError;
 import decaf.error.SubNotIntError;
 import decaf.error.ThisInStaticFuncError;
 import decaf.error.UndeclVarError;
+
 import decaf.frontend.Parser;
+
 import decaf.scope.ClassScope;
 import decaf.scope.FormalScope;
 import decaf.scope.Scope;
 import decaf.scope.ScopeStack;
 import decaf.scope.Scope.Kind;
+
 import decaf.symbol.Class;
 import decaf.symbol.Function;
 import decaf.symbol.Symbol;
 import decaf.symbol.Variable;
+
 import decaf.type.*;
 
 public class TypeCheck extends Tree.Visitor {
@@ -68,6 +72,12 @@ public class TypeCheck extends Tree.Visitor {
 	@Override
 	public void visitUnary(Tree.Unary expr) {
 		expr.expr.accept(this);
+
+		if (expr.expr.type.equal(BaseType.ERROR)) {
+			expr.type = BaseType.ERROR;
+			return ;
+		}
+
 		if(expr.tag == Tree.NEG){
 			if (expr.expr.type.equal(BaseType.ERROR)
 					|| expr.expr.type.equal(BaseType.INT)) {
@@ -78,18 +88,54 @@ public class TypeCheck extends Tree.Visitor {
 				expr.type = BaseType.ERROR;
 			}
 		}
+		else if (expr.tag == Tree.GETCOMPRE) {
+			if (expr.expr.type.equal(BaseType.ERROR)) {
+				expr.type = BaseType.ERROR;
+			} else if (expr.expr.type.equal(BaseType.COMPLEX)) {
+				expr.type = BaseType.INT;
+			} else {
+				issueError(new IncompatUnOpError(expr.getLocation(), "@",
+						expr.expr.type.toString()));
+				expr.type = BaseType.ERROR;
+			}
+		} 
+		else if (expr.tag == Tree.GETCOMPIM) {
+			if (expr.expr.type.equal(BaseType.ERROR)) {
+				expr.type = BaseType.ERROR;
+			} else if (expr.expr.type.equal(BaseType.COMPLEX)) {
+				expr.type = BaseType.INT;
+			} else {
+				issueError(new IncompatUnOpError(expr.getLocation(), "$",
+						expr.expr.type.toString()));
+				expr.type = BaseType.ERROR;
+			}
+		} 
+		else if (expr.tag == Tree.INT2COMP) {
+			if (expr.expr.type.equal(BaseType.ERROR)) {
+				expr.type = BaseType.ERROR;
+			} else if (expr.expr.type.equal(BaseType.INT)) {
+				expr.type = BaseType.COMPLEX;
+			} else {
+				issueError(new IncompatUnOpError(expr.getLocation(), "#",
+						expr.expr.type.toString()));
+				expr.type = BaseType.ERROR;
+			}
+		}
 		else{
+			expr.type = BaseType.BOOL;
+			//expr.type = expr.expr.type;
 			if (!(expr.expr.type.equal(BaseType.BOOL) || expr.expr.type
 					.equal(BaseType.ERROR))) {
 				issueError(new IncompatUnOpError(expr.getLocation(), "!",
 						expr.expr.type.toString()));
+				expr.type = BaseType.ERROR;
 			}
-			expr.type = BaseType.BOOL;
 		}
 	}
 
 	@Override
 	public void visitLiteral(Tree.Literal literal) {
+		//if (literal.typeTag == Tree.COMPIMG) System.out.println("checking literal ");
 		switch (literal.typeTag) {
 		case Tree.INT:
 			literal.type = BaseType.INT;
@@ -99,6 +145,9 @@ public class TypeCheck extends Tree.Visitor {
 			break;
 		case Tree.STRING:
 			literal.type = BaseType.STRING;
+			break;
+		case Tree.COMPIMG:
+			literal.type = BaseType.COMPLEX;
 			break;
 		}
 	}
@@ -589,20 +638,29 @@ public class TypeCheck extends Tree.Visitor {
 			case Tree.MINUS:
 			case Tree.MUL:
 			case Tree.DIV:
-				return left.type;
+				//return left.type;
 			case Tree.MOD:
-				return BaseType.INT;
+				//return BaseType.INT;
 			default:
-				return BaseType.BOOL;
+				//return BaseType.BOOL;
 			}
+			return BaseType.ERROR;
 		}
 
 		boolean compatible = false;
 		Type returnType = BaseType.ERROR;
 		switch (op) {
 		case Tree.PLUS:
-		case Tree.MINUS:
 		case Tree.MUL:
+			// complex operation to be filled
+			if (left.type.equal(BaseType.COMPLEX) || right.type.equal(BaseType.COMPLEX)) {
+				returnType = BaseType.COMPLEX;
+				if ((left.type.equal(BaseType.COMPLEX) || left.type.equal(BaseType.INT)) && (right.type.equal(BaseType.COMPLEX) || right.type.equal(BaseType.INT))) {
+					compatible = true;
+				} else compatible = false;
+				break;
+			}
+		case Tree.MINUS:
 		case Tree.DIV:
 			compatible = left.type.equals(BaseType.INT)
 					&& left.type.equal(right.type);
@@ -640,6 +698,7 @@ public class TypeCheck extends Tree.Visitor {
 		if (!compatible) {
 			issueError(new IncompatBinOpError(location, left.type.toString(),
 					Parser.opStr(op), right.type.toString()));
+			returnType = BaseType.ERROR;
 		}
 		return returnType;
 	}

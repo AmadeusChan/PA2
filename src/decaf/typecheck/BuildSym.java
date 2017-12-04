@@ -13,14 +13,17 @@ import decaf.error.DecafError;
 import decaf.error.DeclConflictError;
 import decaf.error.NoMainClassError;
 import decaf.error.OverridingVarError;
+
 import decaf.scope.ClassScope;
 import decaf.scope.GlobalScope;
 import decaf.scope.LocalScope;
 import decaf.scope.ScopeStack;
+
 import decaf.symbol.Class;
 import decaf.symbol.Function;
 import decaf.symbol.Symbol;
 import decaf.symbol.Variable;
+
 import decaf.type.BaseType;
 import decaf.type.FuncType;
 
